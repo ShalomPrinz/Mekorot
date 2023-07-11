@@ -1,3 +1,3 @@
-import NavbarWrapper from "./Navbar/Navbar";
+import Navbar from "./Navbar";
 
-export { NavbarWrapper as Navbar };
+export { Navbar };

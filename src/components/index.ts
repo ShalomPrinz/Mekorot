@@ -1,4 +1,5 @@
 import Navbar from "./Navbar";
 import Editor from "./Editor";
+import Viewer from "./Viewer";
 
-export { Editor, Navbar };
+export { Editor, Navbar, Viewer };

@@ -1,6 +1,5 @@
-import { Editor, Navbar } from "./components";
+import { Editor, Navbar, Viewer } from "./components";
 import { DafProvider } from "./contexts";
-
 function App() {
   return (
     <>
@@ -12,7 +11,7 @@ function App() {
               <Editor />
             </div>
             <div className="col m-4">
-              <h3>Viewer</h3>
+              <Viewer />
             </div>
           </DafProvider>
         </div>

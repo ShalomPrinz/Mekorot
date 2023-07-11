@@ -73,7 +73,7 @@
                   compressedListOfSections.en[0]));
           done = firstSection == "nosections";
         }
-        console.log(aht);
+        // console.log(aht);
         if (done) {
           var href =
             aht.texts.textOrSearch.getSiteURL(ref.mgType || "Library") +
@@ -88,30 +88,6 @@
             },
           });
           console.log(href);
-          return;
-          if (
-            (e && e.ctrlKey) ||
-            (typeof MG !== "undefined" &&
-              (!MG.state || MG.state.specialPage !== "home"))
-          ) {
-            var newtab = window.open(href);
-          }
-          if (newtab) return newtab;
-          if (
-            ref.mgType &&
-            typeof MG != "undefined" &&
-            (ref.mgType == MG.site ||
-              (ref.mgType == "Tanakh" && MG.site == "MikraotGedolot"))
-          ) {
-            var url = document.createElement("a");
-            url.href = href;
-            if (
-              MG.setStateFromLocation(url, {
-                beforeBrowse: true,
-              }) !== false
-            )
-              history.pushState(MG.baseState, null, url.href);
-          } else window.location = href;
         } else {
           if (trimmedValue != ref.book)
             ref.segments = [trimmedValue, trimmedValue];

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="https://alhatorah.org/Home/ref.php"></script>
+    <script src="./ref.php"></script>
     <style>
       .autocomplete-active {
         background-color: pink;
@@ -13,15 +13,113 @@
     </style>
   </head>
   <body>
-    <form method="get" autocomplete="off" action="">
-      <label for="search-input">הכנס מילות חיפוש או ספר ופרק: </label>
-      <input placeholder="בחרו טקסט או חפשו מלים" id="search-input" />
-    </form>
+    <label for="search-input">הכנס מילות חיפוש או ספר ופרק: </label>
+    <input
+      autocomplete="off"
+      placeholder="בחרו טקסט או חפשו מלים"
+      id="search-input"
+    />
 
     <script>
       document.getElementById("search-input").focus();
 
       let currentFocus;
+
+      function go(inputSelector, e) {
+        var input = $(inputSelector)[0],
+          value = input.value,
+          trimmedValue = value.trim();
+        if (trimmedValue == "") return;
+        var ref = aht.texts.parseInputRef(value);
+        if (
+          !ref.book ||
+          (!ref.url &&
+            !aht.texts.data[ref.book].expandedListOfSections &&
+            !aht.texts.data[ref.book].compressedListOfSections &&
+            !aht.texts.data[ref.book].isParashah)
+        ) {
+          aht.texts.textOrSearch.search(value);
+          return;
+        }
+        var done =
+          aht.texts.data[ref.book].isParashah ||
+          (ref.segments && typeof ref.segments[2] != "undefined");
+        if (done && ref.segments && typeof ref.segments[2] != "undefined") {
+          var allChapters = aht.texts.database.getExpandedListOfSections(
+              ref.book
+            ),
+            chapter = ref.segments[2];
+          if (ref.hasAmudim && typeof chapter === "object")
+            chapter = chapter[0] + chapter[1];
+          if (ref.Yerushalmi) {
+            chapter = ref.Yerushalmi[1];
+          }
+          if (!allChapters[chapter]) {
+            aht.texts.textOrSearch.search(value);
+            return;
+          }
+        }
+        if (ref.url && !done) {
+          var compressedListOfSections =
+              aht.texts.data[ref.book] &&
+              aht.texts.data[ref.book].compressedListOfSections,
+            firstSection =
+              compressedListOfSections &&
+              ((compressedListOfSections.he &&
+                compressedListOfSections.he.length == 1 &&
+                compressedListOfSections.he[0]) ||
+                (compressedListOfSections.en &&
+                  compressedListOfSections.en.length == 1 &&
+                  compressedListOfSections.en[0]));
+          done = firstSection == "nosections";
+        }
+        console.log(aht);
+        if (done) {
+          var href =
+            aht.texts.textOrSearch.getSiteURL(ref.mgType || "Library") +
+            "#!" +
+            ref.url.replace(/ /g, "_");
+
+          // NOT WORKING!
+          $.ajax({
+            url: href,
+            success: function (data) {
+              alert(data);
+            },
+          });
+          console.log(href);
+          return;
+          if (
+            (e && e.ctrlKey) ||
+            (typeof MG !== "undefined" &&
+              (!MG.state || MG.state.specialPage !== "home"))
+          ) {
+            var newtab = window.open(href);
+          }
+          if (newtab) return newtab;
+          if (
+            ref.mgType &&
+            typeof MG != "undefined" &&
+            (ref.mgType == MG.site ||
+              (ref.mgType == "Tanakh" && MG.site == "MikraotGedolot"))
+          ) {
+            var url = document.createElement("a");
+            url.href = href;
+            if (
+              MG.setStateFromLocation(url, {
+                beforeBrowse: true,
+              }) !== false
+            )
+              history.pushState(MG.baseState, null, url.href);
+          } else window.location = href;
+        } else {
+          if (trimmedValue != ref.book)
+            ref.segments = [trimmedValue, trimmedValue];
+          aht.texts.textOrSearch.hopingForChapters = ref;
+          input.value = input.value.trim() + " ";
+          $(input).triggerHandler("input");
+        }
+      }
 
       function closeAllLists(element) {
         $(".autocomplete-dropdown").not(element).remove();
@@ -30,21 +128,17 @@
       function handleClick(params) {
         var input = params.input;
         closeAllLists();
+        // if there is option like this
         if (params.item.getAttribute("data-value"))
           input.value = params.item.getAttribute("data-value");
         else {
           aht.texts.textOrSearch.search(input.value);
           return false;
         }
-        aht.texts.textOrSearch.go(input);
+        go(input);
       }
       function buildDropdown(input, suggestions) {
-        var dropdown,
-          items,
-          line,
-          i,
-          windowHeight,
-          $input = $(input);
+        var dropdown, items, line;
         currentFocus = -1;
         dropdown = document.createElement("DIV");
         dropdown.setAttribute("class", "autocomplete-dropdown");
@@ -58,7 +152,7 @@
         items.setAttribute("id", input.id + "autocomplete-list");
         items.setAttribute("class", "autocomplete-items");
         dropdown.appendChild(items);
-        for (i = 0; i < suggestions.length; i++) {
+        for (let i = 0; i < suggestions.length; i++) {
           line = document.createElement("DIV");
           line.setAttribute("class", "autocomplete-item");
           line.setAttribute("data-value", suggestions[i].value);
@@ -134,7 +228,6 @@
       });
       function callGetSuggestions(input, response) {
         var value = input.value,
-          $form = $(input).closest("form"),
           lang = "he";
         aht.texts.textOrSearch.getSuggestions(
           {

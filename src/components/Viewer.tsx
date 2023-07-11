@@ -4,22 +4,23 @@ import {
   Page,
   View,
   Text,
-  //   StyleSheet,
+  StyleSheet,
   Font,
 } from "@react-pdf/renderer";
 
-// Create styles
-// const styles = StyleSheet.create({
-//   page: {
-//     flexDirection: "row",
-//     backgroundColor: "#E4E4E4",
-//   },
-//   section: {
-//     margin: 10,
-//     padding: 10,
-//     flexGrow: 1,
-//   },
-// });
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: "row",
+    backgroundColor: "pink",
+  },
+  section: {
+    textAlign: "justify",
+    fontFamily: "Heebo",
+    margin: 10,
+    padding: 10,
+    flexGrow: 1,
+  },
+});
 
 Font.register({
   family: "Heebo",
@@ -31,9 +32,21 @@ function Viewer() {
     <>
       <PDFViewer>
         <Document>
-          <Page size="A4">
-            <View style={{ textAlign: "justify", fontFamily: "Heebo" }}>
-              <Text>כךדגל חכךגדל חכךדגל חכךלדח ךל חדגךלכח ךלכ ךלגדח כךלגד</Text>
+          <Page size="A4" style={styles.page}>
+            <View style={styles.section}>
+              <Text>
+                כךדגל חכךגדל חכךדגל חכךלדח ךל חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ
+                ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח
+                ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג
+                חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח
+                כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ
+                ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח
+                ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג
+                חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח
+                כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ
+                ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח
+                ךלכ ךלגדח כךלגד
+              </Text>
             </View>
           </Page>
         </Document>

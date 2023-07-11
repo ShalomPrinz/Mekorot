@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://alhatorah.org/Home/ref.php"></script>
+  </head>
+  <body>
+    <form method="get" autocomplete="off" action="">
+      <label>
+        <span>הכנס מילות חיפוש או ספר ופרק: </span>
+        <input placeholder="בחרו טקסט או חפשו מלים" id="search-input" />
+      </label>
+    </form>
+
+    <script>
+      console.log(document.querySelector(".chapter-input-form"));
+      document.getElementById("search-input").focus();
+      window.ahtHome = {};
+      window.ahtHome.autocomplete = {
+        maxLines: 50,
+        closeAllLists: function (elmnt) {
+          $(".autocomplete-dropdown").not(elmnt).remove();
+          this.currentFocus = -1;
+        },
+      };
+      window.ahtHome.autocomplete.handleClick = function (params) {
+        var input = params.input,
+          $form = $(input).closest("form"),
+          isTopicNameInput = $form.hasClass("topic-input-form"),
+          search = false;
+        window.ahtHome.handlingClick = Date.now();
+        this.closeAllLists();
+        if (params.item.getAttribute("data-value"))
+          input.value = params.item.getAttribute("data-value");
+        else {
+          if (isTopicNameInput) search = true;
+          else {
+            aht.texts.textOrSearch.search(input.value);
+            return false;
+          }
+        }
+        if (isTopicNameInput) {
+          var $fullText = $form.find(".possible-fulltext");
+          if (search) $fullText.attr("name", "fulltext");
+          $form.submit();
+          if (search) $fullText.removeAttr("name");
+        } else aht.texts.textOrSearch.go(input);
+      };
+      window.ahtHome.autocomplete.buildDropdown = function (
+        input,
+        suggestions
+      ) {
+        var dropdown,
+          items,
+          line,
+          i,
+          windowHeight,
+          $input = $(input);
+        window.ahtHome.autocomplete.currentFocus = -1;
+        dropdown = document.createElement("DIV");
+        dropdown.setAttribute("class", "autocomplete-dropdown");
+        input.parentNode.appendChild(dropdown);
+        line = document.createElement("DIV");
+        line.setAttribute("class", "autocomplete-item");
+        line.innerHTML =
+          '<span>חפש</span>: "<strong>' + input.value + '</strong>"';
+        dropdown.appendChild(line);
+        items = document.createElement("DIV");
+        items.setAttribute("id", input.id + "autocomplete-list");
+        items.setAttribute("class", "autocomplete-items");
+        if (window.ios)
+          windowHeight =
+            (window.innerHeight > window.innerWidth ? 0.67 : 0.4) *
+            window.innerHeight;
+        else windowHeight = window.innerHeight;
+        items.setAttribute(
+          "style",
+          "max-height: " +
+            (windowHeight - $(line).outerHeight() - $(line).offset().top) +
+            "px"
+        );
+        dropdown.appendChild(items);
+        for (i = 0; i < suggestions.length; i++) {
+          line = document.createElement("DIV");
+          line.setAttribute("class", "autocomplete-item");
+          line.setAttribute("data-value", suggestions[i].value);
+          line.innerHTML = suggestions[i].text;
+          items.appendChild(line);
+        }
+        $(dropdown).on("click", ".autocomplete-item", function (e) {
+          window.ahtHome.autocomplete.handleClick({
+            item: this,
+            input: input,
+          });
+          return false;
+        });
+      };
+      function autocomplete(input, getSuggestions) {
+        $(input).on("input", function (e) {
+          window.ahtHome.autocomplete.closeAllLists();
+          if (!this.value) return false;
+          getSuggestions(input, function (suggestions) {
+            window.ahtHome.autocomplete.closeAllLists();
+            window.ahtHome.autocomplete.buildDropdown(input, suggestions);
+          });
+        });
+        input.addEventListener("keydown", function (e) {
+          var x = document.getElementById(this.id + "autocomplete-list");
+          if (x) x = x.getElementsByTagName("div");
+          if (e.keyCode == 40) {
+            window.ahtHome.autocomplete.currentFocus++;
+            addActive(x, 1);
+          } else if (e.keyCode == 38) {
+            window.ahtHome.autocomplete.currentFocus--;
+            addActive(x, -1);
+          } else if (e.keyCode == 13) {
+            if (window.ahtHome.autocomplete.currentFocus > -1) {
+              e.preventDefault();
+              if (x) x[window.ahtHome.autocomplete.currentFocus].click();
+            }
+          }
+        });
+        function addActive(x, dir) {
+          if (!x) return false;
+          removeActive(x);
+          if (window.ahtHome.autocomplete.currentFocus >= x.length) {
+            window.ahtHome.autocomplete.currentFocus = 0;
+            dir = -1;
+          }
+          if (window.ahtHome.autocomplete.currentFocus < 0) {
+            window.ahtHome.autocomplete.currentFocus = x.length - 1;
+            dir = 1;
+          }
+          x[window.ahtHome.autocomplete.currentFocus].classList.add(
+            "autocomplete-active"
+          );
+          var $list = $(".autocomplete-items");
+          (scrollTop = $list.scrollTop()),
+            (itemTop = x[window.ahtHome.autocomplete.currentFocus].offsetTop);
+          if (dir == 1) {
+            var itemHeight = $(
+                x[window.ahtHome.autocomplete.currentFocus]
+              ).outerHeight(true),
+              listHeight = $list.height();
+            if (itemTop + itemHeight > listHeight - scrollTop)
+              $list.scrollTop(itemTop + itemHeight - listHeight);
+          } else if (itemTop < scrollTop) $list.scrollTop(itemTop);
+        }
+        function removeActive(x) {
+          for (var i = 0; i < x.length; i++)
+            x[i].classList.remove("autocomplete-active");
+        }
+        document.addEventListener("click", function (e) {
+          window.ahtHome.autocomplete.closeAllLists(e.target);
+        });
+      }
+      aht.texts.init(function () {}, {
+        tree: false,
+      });
+      window.ahtHome.callGetSuggestions = function (input, response) {
+        var value = input.value,
+          $form = $(input).closest("form"),
+          lang = "he";
+        $form.attr("lang", lang);
+        if ($form.hasClass("topic-input-form"))
+          window.ahtHome.getTopicSuggestions(
+            {
+              term: value,
+            },
+            response,
+            lang
+          );
+        else
+          aht.texts.textOrSearch.getSuggestions(
+            {
+              term: value,
+            },
+            response,
+            lang
+          );
+      };
+      window.ahtHome.callTextOrSearchGo = function (form) {
+        aht.texts.textOrSearch.go(
+          $(form)
+            .find("label.lang-" + window.ahtHome.settings.lang)
+            .find("input")
+        );
+        return false;
+      };
+      window.ahtHome.getTopicSuggestions = function (request, response, lang) {
+        var value = util.normalizeReferenceOrTopicName(request.term),
+          startExp = new RegExp("^" + value + ".*", "i"),
+          middleExp = new RegExp("^.+" + value + ".*", "i"),
+          linesStart = [],
+          linesMiddle = [];
+        $.each(ahtAllTopics, function (key, data) {
+          $.each([data.he, data.name, key], function (i, title) {
+            if (!title) return;
+            if (startExp.test(title)) {
+              aht.texts.textOrSearch.pushLine(linesStart, value, title, key);
+              return false;
+            }
+            if (value.length > 2 && middleExp.test(title)) {
+              aht.texts.textOrSearch.pushLine(linesMiddle, value, title, key);
+              return false;
+            }
+          });
+        });
+        response($.merge(linesStart, linesMiddle));
+      };
+      window.ahtHome.topicOrSearchGo = function (form) {
+        aht.texts.textOrSearch.go(
+          $(form)
+            .find("label.lang-" + window.ahtHome.settings.lang)
+            .find("input")
+        );
+        return false;
+      };
+      autocomplete(
+        document.getElementById("search-input"),
+        window.ahtHome.callGetSuggestions
+      );
+    </script>
+  </body>
+</html>

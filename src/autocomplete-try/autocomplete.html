@@ -21,44 +21,31 @@
     <script>
       document.getElementById("search-input").focus();
 
-      let autocompleteData = {
-        maxLines: 50,
-        closeAllLists: function (elmnt) {
-          $(".autocomplete-dropdown").not(elmnt).remove();
-          this.currentFocus = -1;
-        },
-      };
-      autocompleteData.handleClick = function (params) {
-        var input = params.input,
-          $form = $(input).closest("form"),
-          isTopicNameInput = $form.hasClass("topic-input-form"),
-          search = false;
-        let handlingClick = Date.now();
-        this.closeAllLists();
+      let currentFocus;
+
+      function closeAllLists(element) {
+        $(".autocomplete-dropdown").not(element).remove();
+        currentFocus = -1;
+      }
+      function handleClick(params) {
+        var input = params.input;
+        closeAllLists();
         if (params.item.getAttribute("data-value"))
           input.value = params.item.getAttribute("data-value");
         else {
-          if (isTopicNameInput) search = true;
-          else {
-            aht.texts.textOrSearch.search(input.value);
-            return false;
-          }
+          aht.texts.textOrSearch.search(input.value);
+          return false;
         }
-        if (isTopicNameInput) {
-          var $fullText = $form.find(".possible-fulltext");
-          if (search) $fullText.attr("name", "fulltext");
-          $form.submit();
-          if (search) $fullText.removeAttr("name");
-        } else aht.texts.textOrSearch.go(input);
-      };
-      autocompleteData.buildDropdown = function (input, suggestions) {
+        aht.texts.textOrSearch.go(input);
+      }
+      function buildDropdown(input, suggestions) {
         var dropdown,
           items,
           line,
           i,
           windowHeight,
           $input = $(input);
-        autocompleteData.currentFocus = -1;
+        currentFocus = -1;
         dropdown = document.createElement("DIV");
         dropdown.setAttribute("class", "autocomplete-dropdown");
         input.parentNode.appendChild(dropdown);
@@ -70,17 +57,6 @@
         items = document.createElement("DIV");
         items.setAttribute("id", input.id + "autocomplete-list");
         items.setAttribute("class", "autocomplete-items");
-        if (window.ios)
-          windowHeight =
-            (window.innerHeight > window.innerWidth ? 0.67 : 0.4) *
-            window.innerHeight;
-        else windowHeight = window.innerHeight;
-        items.setAttribute(
-          "style",
-          "max-height: " +
-            (windowHeight - $(line).outerHeight() - $(line).offset().top) +
-            "px"
-        );
         dropdown.appendChild(items);
         for (i = 0; i < suggestions.length; i++) {
           line = document.createElement("DIV");
@@ -90,58 +66,56 @@
           items.appendChild(line);
         }
         $(dropdown).on("click", ".autocomplete-item", function (e) {
-          autocompleteData.handleClick({
+          handleClick({
             item: this,
             input: input,
           });
           return false;
         });
-      };
+      }
       function autocomplete(input, getSuggestions) {
         $(input).on("input", function (e) {
-          autocompleteData.closeAllLists();
+          closeAllLists();
           if (!this.value) return false;
           getSuggestions(input, function (suggestions) {
-            autocompleteData.closeAllLists();
-            autocompleteData.buildDropdown(input, suggestions);
+            closeAllLists();
+            buildDropdown(input, suggestions);
           });
         });
+        addActive(document.getElementById(this.id + "autocomplete-list"), 0);
         input.addEventListener("keydown", function (e) {
-          console.log(e);
           var x = document.getElementById(this.id + "autocomplete-list");
           if (x) x = x.getElementsByTagName("div");
           if (e.keyCode == 40) {
-            autocompleteData.currentFocus++;
+            currentFocus++;
             addActive(x, 1);
           } else if (e.keyCode == 38) {
-            autocompleteData.currentFocus--;
+            currentFocus--;
             addActive(x, -1);
           } else if (e.keyCode == 13) {
-            if (autocompleteData.currentFocus > -1) {
+            if (currentFocus > -1) {
               e.preventDefault();
-              if (x) x[autocompleteData.currentFocus].click();
+              if (x) x[currentFocus].click();
             }
           }
         });
         function addActive(x, dir) {
           if (!x) return false;
           removeActive(x);
-          if (autocompleteData.currentFocus >= x.length) {
-            autocompleteData.currentFocus = 0;
+          if (currentFocus >= x.length) {
+            currentFocus = 0;
             dir = -1;
           }
-          if (autocompleteData.currentFocus < 0) {
-            autocompleteData.currentFocus = x.length - 1;
+          if (currentFocus < 0) {
+            currentFocus = x.length - 1;
             dir = 1;
           }
-          x[autocompleteData.currentFocus].classList.add("autocomplete-active");
+          x[currentFocus].classList.add("autocomplete-active");
           var $list = $(".autocomplete-items");
           (scrollTop = $list.scrollTop()),
-            (itemTop = x[autocompleteData.currentFocus].offsetTop);
+            (itemTop = x[currentFocus].offsetTop);
           if (dir == 1) {
-            var itemHeight = $(x[autocompleteData.currentFocus]).outerHeight(
-                true
-              ),
+            var itemHeight = $(x[currentFocus]).outerHeight(true),
               listHeight = $list.height();
             if (itemTop + itemHeight > listHeight - scrollTop)
               $list.scrollTop(itemTop + itemHeight - listHeight);
@@ -152,7 +126,7 @@
             x[i].classList.remove("autocomplete-active");
         }
         document.addEventListener("click", function (e) {
-          autocompleteData.closeAllLists(e.target);
+          closeAllLists(e.target);
         });
       }
       aht.texts.init(function () {}, {

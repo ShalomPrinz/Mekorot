@@ -1,10 +1,19 @@
-import { Navbar } from "./components";
+import { Editor, Navbar } from "./components";
 
 function App() {
   return (
     <>
       <Navbar />
-      <h1>Mekorot</h1>
+      <div className="container">
+        <div className="row d-flex">
+          <div className="col m-4">
+            <Editor />
+          </div>
+          <div className="col m-4">
+            <h3>Viewer</h3>
+          </div>
+        </div>
+      </div>
     </>
   );
 }

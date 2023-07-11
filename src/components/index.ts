@@ -1,3 +1,4 @@
 import Navbar from "./Navbar";
+import Editor from "./Editor";
 
-export { Navbar };
+export { Editor, Navbar };

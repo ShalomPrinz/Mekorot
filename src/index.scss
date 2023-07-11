@@ -1,13 +1,23 @@
 @import "~bootstrap/scss/bootstrap.scss";
 
 :root {
-  font-family: Heebo;
-  line-height: 1.5;
-  font-weight: 400;
+  --default-bg-color: hsl(228, 73%, 21%);
+  --default-color: white;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+* {
+  font-family: Heebo;
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+.bg-default {
+  background-color: var(--default-bg-color);
+  color: var(--default-color);
 }

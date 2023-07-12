@@ -1,5 +1,9 @@
 @import "~bootstrap/scss/bootstrap.scss";
 
+html {
+  direction: rtl;
+}
+
 :root {
   --default-bg-color: hsl(228, 73%, 21%);
   --default-color: white;
@@ -11,13 +15,6 @@
   -webkit-text-size-adjust: 100%;
 }
 
-* {
-  direction: rtl;
-  font-family: Heebo;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
 .bg-default {
   background-color: var(--default-bg-color);
   color: var(--default-color);
@@ -25,4 +22,19 @@
 
 button {
   border: none;
+}
+
+.navbar {
+  font-family: Heebo;
+}
+
+.ql-editor {
+  direction: rtl;
+  text-align: right;
+  height: 222px;
+}
+
+.PDFViewer {
+  width: 120%;
+  height: 100vh;
 }

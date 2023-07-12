@@ -28,7 +28,7 @@ function Viewer() {
   const { mekorot } = useDafContext();
   return (
     <>
-      <PDFViewer style={{ width: "120%", height: "100vh" }}>
+      <PDFViewer className="PDFViewer">
         <Document>
           <Page size="A4">
             {mekorot.map((makor) => {

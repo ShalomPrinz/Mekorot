@@ -7,18 +7,15 @@ import {
   StyleSheet,
   Font,
 } from "@react-pdf/renderer";
+import { useDafContext } from "../contexts";
 
 const styles = StyleSheet.create({
-  page: {
-    flexDirection: "row",
-    backgroundColor: "pink",
-  },
   section: {
     textAlign: "justify",
     fontFamily: "Heebo",
     margin: 10,
     padding: 10,
-    flexGrow: 1,
+    border: 2,
   },
 });
 
@@ -28,26 +25,19 @@ Font.register({
 });
 
 function Viewer() {
+  const { mekorot } = useDafContext();
   return (
     <>
-      <PDFViewer>
+      <PDFViewer style={{ width: "120%", height: "100vh" }}>
         <Document>
-          <Page size="A4" style={styles.page}>
-            <View style={styles.section}>
-              <Text>
-                כךדגל חכךגדל חכךדגל חכךלדח ךל חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ
-                ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח
-                ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג
-                חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח
-                כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ
-                ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח
-                ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג
-                חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח
-                כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ
-                ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח ךלכ ךלגדח כךלג חדגךלכח
-                ךלכ ךלגדח כךלגד
-              </Text>
-            </View>
+          <Page size="A4">
+            {mekorot.map((makor) => {
+              return (
+                <View key={makor.title} style={styles.section}>
+                  <Text>{makor.content}</Text>
+                </View>
+              );
+            })}
           </Page>
         </Document>
       </PDFViewer>

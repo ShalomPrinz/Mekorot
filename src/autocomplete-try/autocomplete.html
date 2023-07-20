@@ -12,12 +12,14 @@
     </style>
   </head>
   <body>
-    <label for="search-input">הכנס מילות חיפוש או ספר ופרק: </label>
-    <input
-      autocomplete="off"
-      placeholder="בחרו טקסט או חפשו מלים"
-      id="search-input"
-    />
+    <div>
+      <label for="search-input">הכנס מילות חיפוש או ספר ופרק: </label>
+      <input
+        autocomplete="off"
+        placeholder="בחרו טקסט או חפשו מלים"
+        id="search-input"
+      />
+    </div>
 
     <p id="text"></p>
 
@@ -86,7 +88,10 @@
             `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
           );
           let json = await response.json();
-          let text = json.contents;
+          let text = json.contents.replace(
+            /<(cn|tn|abb)>(.+?)<\/(cn|tn|abb)>/g,
+            ""
+          );
           document.getElementById("text").innerHTML = text;
         } else {
           if (trimmedValue != ref.book)

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
-    <script src="./ref.php"></script>
+    <script src="./ref.js"></script>
     <style>
       .autocomplete-active {
         background-color: pink;
@@ -18,6 +18,8 @@
       placeholder="בחרו טקסט או חפשו מלים"
       id="search-input"
     />
+
+    <p id="text"></p>
 
     <script>
       document.getElementById("search-input").focus();
@@ -64,28 +66,28 @@
               aht.texts.data[ref.book].compressedListOfSections,
             firstSection =
               compressedListOfSections &&
-              ((compressedListOfSections.he &&
-                compressedListOfSections.he.length == 1 &&
-                compressedListOfSections.he[0]) ||
-                (compressedListOfSections.en &&
-                  compressedListOfSections.en.length == 1 &&
-                  compressedListOfSections.en[0]));
+              compressedListOfSections.he &&
+              compressedListOfSections.he.length == 1 &&
+              compressedListOfSections.he[0];
           done = firstSection == "nosections";
         }
         if (done) {
-          var href =
-            aht.texts.textOrSearch.getSiteURL(ref.mgType || "Library") +
-            "#!" +
-            ref.url.replace(/ /g, "_");
+          let NAME_OF_BOOK =
+            ref.mgType && ref.mgType === "Tanakh"
+              ? "Tanakh Menukad " + ref.book
+              : ref.book;
+          const CHAPTER = Array.isArray(ref.segments[2])
+            ? ref.segments[2].join("")
+            : ref.segments[2];
+
+          let url = `https://alhatorah.org/Texts/database.php/${NAME_OF_BOOK}/${CHAPTER}.txt`;
 
           let response = await fetch(
-            `https://api.allorigins.win/get?url=${encodeURIComponent(
-              "https://mg.alhatorah.org/texts/database.php/Tanakh%20Menukad%20Bereshit/1.txt"
-            )}`
+            `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
           );
           let json = await response.json();
           let text = json.contents;
-          console.log(text);
+          document.getElementById("text").innerHTML = text;
         } else {
           if (trimmedValue != ref.book)
             ref.segments = [trimmedValue, trimmedValue];

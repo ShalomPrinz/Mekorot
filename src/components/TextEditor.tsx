@@ -27,6 +27,7 @@ function TextEditor() {
         theme="snow"
         value={value}
         onChange={setValue}
+        placeholder="הכנס טקסט..."
       />
     </>
   );

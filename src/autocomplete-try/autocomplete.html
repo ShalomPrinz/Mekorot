@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <script src="./ref.php"></script>
     <style>
@@ -25,7 +24,7 @@
 
       let currentFocus;
 
-      function go(inputSelector, e) {
+      async function go(inputSelector, e) {
         var input = $(inputSelector)[0],
           value = input.value,
           trimmedValue = value.trim();
@@ -73,21 +72,20 @@
                   compressedListOfSections.en[0]));
           done = firstSection == "nosections";
         }
-        // console.log(aht);
         if (done) {
           var href =
             aht.texts.textOrSearch.getSiteURL(ref.mgType || "Library") +
             "#!" +
             ref.url.replace(/ /g, "_");
 
-          // NOT WORKING!
-          $.ajax({
-            url: href,
-            success: function (data) {
-              alert(data);
-            },
-          });
-          console.log(href);
+          let response = await fetch(
+            `https://api.allorigins.win/get?url=${encodeURIComponent(
+              "https://mg.alhatorah.org/texts/database.php/Tanakh%20Menukad%20Bereshit/1.txt"
+            )}`
+          );
+          let json = await response.json();
+          let text = json.contents;
+          console.log(text);
         } else {
           if (trimmedValue != ref.book)
             ref.segments = [trimmedValue, trimmedValue];

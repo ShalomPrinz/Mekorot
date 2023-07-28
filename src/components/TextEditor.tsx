@@ -2,9 +2,9 @@ import { useState } from "react";
 import ReactQuill, { Quill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 
-const Font = Quill.import("attributors/style/font");
-Font.whitelist = ["Arial", "David"];
-Quill.register(Font, true);
+const font = Quill.import("attributors/style/font");
+font.whitelist = ["Arial", "David"];
+Quill.register(font, true);
 
 let modules = {
   toolbar: [
@@ -27,7 +27,6 @@ function TextEditor() {
         theme="snow"
         value={value}
         onChange={setValue}
-        placeholder="הכנס טקסט..."
       />
     </>
   );

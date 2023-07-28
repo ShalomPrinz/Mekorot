@@ -1,46 +1,26 @@
-import {
-  PDFViewer,
-  Document,
-  Page,
-  View,
-  Text,
-  StyleSheet,
-  Font,
-} from "@react-pdf/renderer";
 import { useDafContext } from "../contexts";
+import Daf from "./Daf";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
-const styles = StyleSheet.create({
-  section: {
-    textAlign: "justify",
-    fontFamily: "Heebo",
-    margin: 10,
-    padding: 10,
-    border: 2,
-  },
-});
-
-Font.register({
-  family: "Heebo",
-  src: "./src/res/fonts/Heebo.ttf",
-});
+function exportPdf() {
+  html2canvas(document.getElementById("daf")!).then((canvas) => {
+    const imgData = canvas.toDataURL("image/png");
+    const pdf = new jsPDF("p", "mm", "a4");
+    var width = pdf.internal.pageSize.getWidth();
+    var height = pdf.internal.pageSize.getHeight();
+    pdf.addImage(imgData, "PNG", 0, 0, width, height);
+    pdf.save("download.pdf");
+  });
+}
 
 function Viewer() {
   const { mekorot } = useDafContext();
+
   return (
     <>
-      <PDFViewer className="PDFViewer">
-        <Document>
-          <Page size="A4">
-            {mekorot.map((makor) => {
-              return (
-                <View key={makor.title} style={styles.section}>
-                  <Text>{makor.content}</Text>
-                </View>
-              );
-            })}
-          </Page>
-        </Document>
-      </PDFViewer>
+      <Daf mekorot={mekorot} />
+      <button onClick={exportPdf}>Export to PDF</button>
     </>
   );
 }

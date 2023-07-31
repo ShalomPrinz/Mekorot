@@ -88,6 +88,7 @@
             `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`
           );
           let json = await response.json();
+          console.log("response json", json)
           let text = json.contents.replace(
             /<(cn|tn|abb)>(.+?)<\/(cn|tn|abb)>/g,
             ""
@@ -106,6 +107,7 @@
         $(".autocomplete-dropdown").not(element).remove();
         currentFocus = -1;
       }
+     
       function handleClick(params) {
         var input = params.input;
         closeAllLists();
@@ -118,6 +120,7 @@
         }
         go(input);
       }
+      
       function buildDropdown(input, suggestions) {
         var dropdown, items, line;
         currentFocus = -1;
@@ -148,6 +151,7 @@
           return false;
         });
       }
+      
       function autocomplete(input, getSuggestions) {
         $(input).on("input", function (e) {
           closeAllLists();
@@ -204,9 +208,11 @@
           closeAllLists(e.target);
         });
       }
+      
       aht.texts.init(function () {}, {
         tree: false,
       });
+      
       function callGetSuggestions(input, response) {
         var value = input.value,
           lang = "he";
@@ -218,6 +224,7 @@
           "he"
         );
       }
+      
       autocomplete(document.getElementById("search-input"), callGetSuggestions);
     </script>
   </body>
